@@ -7,6 +7,9 @@ import { useToast } from "@/hooks/use-toast";
 import { useNavigate } from "react-router-dom";
 import * as pdfjsLib from "pdfjs-dist";
 import { FileText, Folder, Paintbrush } from "lucide-react";
+import Navbar from "@/components/Navbar";
+import { MetadataForm } from "@/components/Metadatform";
+import { cn } from "@/lib/utils";
 
 pdfjsLib.GlobalWorkerOptions.workerSrc = `https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js`;
 
@@ -14,115 +17,138 @@ const Upload = () => {
   const { toast } = useToast();
   const navigate = useNavigate();
 
-  const [transcriptFile, setTranscriptFile] = useState(null);
-  const [pageCount, setPageCount] = useState(null);
+  const [transcriptFiles, setTranscriptFiles] = useState([]);
   const [transcriptStatus, setTranscriptStatus] = useState("idle");
+  const [transcriptText, setTranscriptText] = useState("");
 
-  const getPdfPageCount = async (file) => {
-    try {
-      const buffer = await file.arrayBuffer();
-      const loadingTask = pdfjsLib.getDocument({ data: buffer });
-      const pdf = await loadingTask.promise;
-      console.log(file.name, "numPages:", pdf.numPages);
-      return pdf.numPages;
-    } catch (err) {
-      console.error("PDF page count error:", err);
-      return 1;
-    }
-  };
+  const hasFiles = transcriptFiles.length > 0;
+  const hasText = transcriptText.trim().length > 0;
 
-  const handleTranscriptUpload = async (file) => {
+  const canUpload = (hasFiles || hasText) && isMetadataValid;
+
+  const handleTranscriptUpload = async (files) => {
     setTranscriptStatus("idle");
 
-    let pages = 1;
-    if (
-      file.type === "application/pdf" ||
-      file.name.toLowerCase().endsWith(".pdf")
-    ) {
-      try {
-        pages = await getPdfPageCount(file);
-      } catch (err) {
-        console.error("PDF page count error:", err);
-      }
-    }
+    if (!Array.isArray(files) || files.length === 0) return;
 
-    setTranscriptFile(file);
-    setPageCount(pages);
+    setTranscriptFiles(files);
     setTranscriptStatus("success");
 
     toast({
-      title: "Transcript validated",
-      description: `${file.name} — Text layer detected, ${pages} pages`,
+      title: "Transcripts validated",
+      description: `${files.length} file(s) processed`,
     });
   };
+  const [metadata, setMetadata] = useState({
+    caseId: "",
+    insuranceProvider: "",
+    policyType: "",
+    service: "full-pipeline",
+  });
+  const isMetadataValid =
+    metadata.caseId.trim() !== "" &&
+    metadata.insuranceProvider.trim() !== "" &&
+    metadata.policyType.trim() !== "";
 
-  const handleUploadStart = () => {
-    if (!transcriptFile) {
+  const handleUploadStart = async () => {
+    if (!hasFiles && !hasText) {
       toast({
-        title: "Missing transcript",
-        description: "Please upload the medical transcript document",
+        title: "No input provided",
+        description: "Upload a file or enter text to continue",
+        variant: "destructive",
+      });
+      return;
+    }
+    if (!isMetadataValid) {
+      toast({
+        title: "Missing metadata",
+        description: "Please fill in all required metadata fields",
         variant: "destructive",
       });
       return;
     }
 
-    toast({
-      title: "Upload started",
-      description: "Processing transcript...",
-    });
+    try {
+      const formData = new FormData();
 
-    setTimeout(() => {
-      navigate("/processing");
-    }, 1500);
+      transcriptFiles.forEach((file) => {
+        formData.append("files", file);
+      });
+
+      formData.append("rawText", transcriptText);
+      formData.append("caseId", metadata.caseId);
+      formData.append("insuranceProvider", metadata.insuranceProvider);
+      formData.append("policyType", metadata.policyType);
+      formData.append("service", metadata.service);
+
+      const res = await fetch("http://localhost:5000/api/transcripts/upload", {
+        method: "POST",
+        body: formData,
+        credentials: "include",
+      });
+
+      const data = await res.json();
+
+      if (!res.ok) {
+        throw new Error(data.error || "Upload failed");
+      }
+
+      toast({
+        title: "Upload started",
+        description: "Transcript is being processed",
+      });
+
+      navigate(`/processing/${data.transcriptId}`);
+    } catch (err) {
+      toast({
+        title: "Upload failed",
+        description: err.message,
+        variant: "destructive",
+      });
+    }
   };
 
   return (
     <div className="min-h-screen bg-background-light dark:bg-background-dark font-display text-slate-800 dark:text-slate-200 flex flex-col">
+      <Navbar showNavLinks={false} />
       <div className="container max-w-6xl mx-auto p-6 space-y-6">
-        {/* Breadcrumb */}
-        <nav className="mb-4 text-sm text-slate-500 dark:text-slate-400 flex items-center gap-2">
-          <a href="/page" className="hover:underline">
-            Home
-          </a>
-          <span className="text-lg">›</span>
-          <span>Upload</span>
-        </nav>
         {/* Header */}
-        <div className="flex items-start justify-between">
+        <div className="flex items-start justify-between ">
           <div>
             <h1 className="text-3xl font-bold tracking-tight text-white">
-              Upload Transcript
+              Upload Medical Transcript
             </h1>
             <p className="text-slate-300">
-              Upload a single file to begin transcript processing.
+              Upload documents for AI-powered medical code extraction and
+              processing
             </p>
           </div>
         </div>
-        <div className="container max-w-6xl mx-auto p-6 space-y-6">
+
+        <div className="container max-w-6xl mx-auto p-6 space-y-6 ">
           <Tabs defaultValue="transcript" className="w-full">
-            <TabsContent value="transcript" className="mt-4">
+            <TabsContent value="transcript" className="mt-0">
               <UploadZone
                 title="Medical Transcript Document"
                 description="Upload the patient medical transcript for audit review"
                 accept=".pdf,.docx,.txt"
-                icon="document"
+                files={transcriptFiles}
                 onFileSelect={handleTranscriptUpload}
-                file={transcriptFile}
+                onTextChange={setTranscriptText}
                 status={transcriptStatus}
-                preview={
-                  pageCount
-                    ? `${pageCount} pages, Text layer detected`
-                    : undefined
-                }
               />
             </TabsContent>
           </Tabs>
-
-          {transcriptFile && (
-            <Card className="p-4 bg-accent/50 border-accent mt-4 flex justify-end">
+          <MetadataForm metadata={metadata} setMetadata={setMetadata} />{" "}
+          {transcriptFiles && (
+            <Card className="p-4 bg-[#11d4620D] border border-[#11d462] rounded-3xl mt-4 flex justify-end">
               <Button
                 onClick={handleUploadStart}
-                className="gap-2 bg-gradient-to-r from-primary to-secondary hover:opacity-90 transition-opacity"
+                disabled={!canUpload}
+                className={cn(
+                  "gap-2 bg-[#11d462] hover:scale-110 hover:bg-[#11d462]",
+                  !canUpload && "opacity-50 cursor-not-allowed"
+                )}
               >
                 Upload & Start Processing
               </Button>
@@ -130,7 +156,7 @@ const Upload = () => {
           )}
           {/* Upload Guidelines Card */}
           {(transcriptStatus === "idle" || transcriptStatus === "error") && (
-            <Card className="p-6 mt-10 bg-[#11d4620D] border border-[#11d46250] rounded-2xl">
+            <Card className="p-6 mt-10 bg-[#11d4620D] border border-[#11d462] rounded-2xl">
               <div className="flex items-center gap-3 mb-4">
                 <div className="w-8 h-8 flex items-center justify-center bg-[#11d46233] text-[#11d462] rounded-full text-xl font-bold">
                   ?

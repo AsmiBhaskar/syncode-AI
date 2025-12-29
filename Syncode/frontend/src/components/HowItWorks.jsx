@@ -12,21 +12,21 @@ const steps = [
     icon: Scan,
     title: "Extract & Code Automatically",
     description:
-      "Clinical NER and RAG retrieve relevant codes from vetted knowledge bases. Each suggestion includes confidence score and source link.",
+      "Clinical NER and RAG process your documents to extracts relevant codes from vetted knowledge bases, validates them and checks compliance automatically.",
     step: "02",
   },
   {
     icon: CheckCircle,
-    title: "Audit-Ready Output",
+    title: "Get Results",
     description:
-      "Review, edit, and export codes with complete provenance. Every action logged for compliance and ready for payer audits.",
+      "Review and export the suggested codes with complete provenance. Each suggested code comes with a confidence score. ",
     step: "03",
   },
 ];
 
 export const HowItWorks = () => {
   return (
-    <section id="how-it-works" className="py-20 md:py-28 bg-secondary/30">
+    <section id="how-it-works" className="py-5 md:py-10 bg-secondary/30">
       <div className="container mx-auto px-4">
         <div className="text-center max-w-3xl mx-auto mb-16">
           <h2 className="text-3xl md:text-4xl lg:text-5xl font-bold text-yellow-500 mb-4">

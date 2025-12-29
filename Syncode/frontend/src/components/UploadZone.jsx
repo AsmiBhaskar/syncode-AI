@@ -1,10 +1,12 @@
-import { useState, useCallback } from "react";
+import { useState, useRef, useMemo } from "react";
 import {
   Upload,
   FileText,
   CheckCircle2,
   AlertCircle,
   FileCode,
+  X,
+  CheckCircle,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
@@ -15,59 +17,68 @@ export const UploadZone = ({
   title,
   description,
   accept,
-  icon,
+  icon = "document",
+  files = [],
   onFileSelect,
-  file,
   status = "idle",
-  preview,
+  preview = [],
+  onTextChange,
 }) => {
   const [isDragging, setIsDragging] = useState(false);
+  const hiddenFileInput = useRef(null);
+  const IconComponent = icon === "document" ? FileText : FileCode;
+  const formatSize = (size) => `${(size / 1024 / 1024).toFixed(2)} MB`;
+  const [testInput, setTestInput] = useState("");
 
-  const handleDrop = useCallback(
-    (e) => {
-      e.preventDefault();
-      setIsDragging(false);
-      const droppedFile = e.dataTransfer.files[0];
-      if (droppedFile) onFileSelect(droppedFile);
-    },
-    [onFileSelect]
-  );
-
-  const handleDragOver = useCallback((e) => {
-    e.preventDefault();
-    setIsDragging(true);
-  }, []);
-
-  const handleDragLeave = useCallback((e) => {
-    e.preventDefault();
-    setIsDragging(false);
-  }, []);
-
-  const handleFileInput = (e) => {
-    const selectedFile = e.target.files?.[0];
-    if (selectedFile) onFileSelect(selectedFile);
+  const handleTestInputChange = (e) => {
+    setTestInput(e.target.value);
+    onTextChange?.(e.target.value);
   };
 
-  const IconComponent = icon === "document" ? FileText : FileCode;
+  const totalSize = useMemo(
+    () => files.reduce((sum, file) => sum + file.size, 0),
+    [files]
+  );
+
+  const removeFile = (index) => {
+    onFileSelect(files.filter((_, i) => i !== index));
+  };
+
+  const addFiles = (newFiles) => {
+    onFileSelect([...files, ...newFiles]);
+  };
+
+  const handleDrop = (e) => {
+    e.preventDefault();
+    setIsDragging(false);
+    const droppedFiles = Array.from(e.dataTransfer.files);
+    if (droppedFiles.length) addFiles(droppedFiles);
+  };
+
+  const handleFileInput = (e) => {
+    const selectedFiles = Array.from(e.target.files || []);
+    if (selectedFiles.length) addFiles(selectedFiles);
+    e.target.value = "";
+  };
 
   return (
     <Card
       className={cn(
-        "relative overflow-hidden transition-all duration-300",
+        "relative overflow-hidden transition-all",
         isDragging && "ring-2 ring-primary ring-offset-2",
         status === "success" && "ring-1 ring-success/30 bg-[#11d4620D]",
         status === "error" && "ring-1 ring-destructive/30 bg-destructive/5"
       )}
-      onDrop={handleDrop}
-      onDragOver={handleDragOver}
-      onDragLeave={handleDragLeave}
     >
-      <div className="p-8">
-        <div className="flex items-start gap-4">
+      <div className="p-8 space-y-6">
+        {/* Header */}
+        <div className="flex gap-4 ">
           <div
             className={cn(
-              "flex h-14 w-14 shrink-0 items-center justify-center rounded-xl transition-colors",
-              status === "error" ? "bg-red-100" : "bg-[#11d4621a]"
+              "flex h-14 w-14 items-center justify-center rounded-xl border-2",
+              status === "error"
+                ? "bg-red-100 border-red-500"
+                : "bg-[#11d4621a] border-[#11d462]"
             )}
           >
             {status === "success" ? (
@@ -79,93 +90,110 @@ export const UploadZone = ({
             )}
           </div>
 
-          <div className="flex-1 min-w-0">
-            <h3 className="text-lg font-semibold text-white mb-1">{title}</h3>
-            <p className="text-sm text-muted-foreground mb-4">{description}</p>
-
-            {!file ? (
-              <div
-                className={cn(
-                  "flex flex-col items-center justify-center rounded-lg border-2 border-dashed p-8 transition-colors",
-                  isDragging
-                    ? "border-primary bg-primary/5"
-                    : "border-border bg-muted/30"
-                )}
-              >
-                <Upload className="h-10 w-10 text-[#11d462] mb-3" />
-                <p className="text-sm font-medium text-foreground mb-1">
-                  Drop file here or click to browse
-                </p>
-                <p className="text-xs text-muted-foreground">
-                  Supported: {accept.split(",").join(", ")}
-                </p>
-                <Button
-                  size="sm"
-                  variant="outline"
-                  className="mt-3"
-                  onClick={() => {
-                    document.getElementById("hidden-file-input")?.click();
-                  }}
-                >
-                  Browse File
-                </Button>
-                <input
-                  type="file"
-                  accept={accept}
-                  onChange={handleFileInput}
-                  className="absolute inset-0 cursor-pointer opacity-0"
-                />
-              </div>
-            ) : (
-              <div className="space-y-3">
-                <div className="flex items-center gap-3 rounded-lg border border-[#11d462] bg-black p-3">
-                  <IconComponent className="h-5 w-5 text-blue-200 shrink-0" />
-                  <div className="flex-1 min-w-0">
-                    <p className="text-sm font-medium text-foreground truncate">
-                      {file.name}
-                    </p>
-                    <p className="text-xs text-muted-foreground">
-                      {file.size && !isNaN(file.size)
-                        ? (file.size / 1024 / 1024).toFixed(2)
-                        : "0"}{" "}
-                      MB
-                    </p>
-                  </div>
-                  {status === "success" && (
-                    <CheckCircle2 className="h-5 w-5 text-[#11d462] shrink-0" />
-                  )}
-                </div>
-
-                {preview && (
-                  <div className="flex gap-2 flex-wrap">
-                    {preview.split(", ").map((item, i) => (
-                      <Badge key={i} variant="outline" className="text-xs">
-                        {item}
-                      </Badge>
-                    ))}
-                  </div>
-                )}
-
-                <Button
-                  variant="outline"
-                  size="sm"
-                  onClick={() => {
-                    const input = document.createElement("input");
-                    input.type = "file";
-                    input.accept = accept;
-                    input.onchange = (e) => {
-                      const newFile = e.target.files?.[0];
-                      if (newFile) onFileSelect(newFile);
-                    };
-                    input.click();
-                  }}
-                >
-                  Replace file
-                </Button>
-              </div>
+          <div>
+            <h3 className="text-lg font-semibold text-white">{title}</h3>
+            {description && (
+              <p className="text-sm text-muted-foreground">{description}</p>
             )}
           </div>
         </div>
+
+        {/* Drop Area */}
+        <div
+          className={cn(
+            "flex flex-col items-center justify-center rounded-lg border-2 border-dashed border-[#11d462] p-8 cursor-pointer transition-colors",
+            isDragging ? "bg-[#11d4620D]" : "bg-muted/30"
+          )}
+          onDrop={handleDrop}
+          onDragOver={(e) => {
+            e.preventDefault();
+            setIsDragging(true);
+          }}
+          onDragLeave={() => setIsDragging(false)}
+          onClick={() => hiddenFileInput.current.click()}
+        >
+          <Upload className="h-10 w-10 text-[#11d462] mb-3" />
+          <p className="text-sm font-medium mb-1">
+            Drop files here or click to browse
+          </p>
+          <p className="text-xs text-muted-foreground">Supported: {accept}</p>
+
+          <Button
+            variant="outline"
+            size="sm"
+            className="mt-3 text-black border-none hover:scale-110 hover:bg-[#11d462]"
+            onClick={(e) => {
+              e.stopPropagation();
+              hiddenFileInput.current.click();
+            }}
+          >
+            Browse Files
+          </Button>
+
+          <input
+            ref={hiddenFileInput}
+            type="file"
+            accept={accept}
+            multiple
+            onChange={handleFileInput}
+            className="hidden"
+          />
+        </div>
+        {/* NORMAL INPUT FIELD */}
+        <label className="block text-sm mb-2 text-[#11d462]">Test Input</label>
+        <input
+          type="text"
+          value={testInput}
+          onChange={handleTestInputChange}
+          className="relative z-[9999] w-full px-4 py-3 bg-input border border-[#11d462] rounded-lg focus:border-[#11d462] focus:outline-none focus:ring-1 focus:ring-[#11d462]"
+        />
+
+        {/* File List */}
+        {files.length > 0 && (
+          <div className="space-y-3">
+            <div className="flex justify-between text-sm">
+              <span>Selected Files ({files.length})</span>
+              <span className="text-muted-foreground">
+                Total: {formatSize(totalSize)}
+              </span>
+            </div>
+
+            {files.map((file, index) => (
+              <div
+                key={index}
+                className="flex items-center justify-between bg-black border border-[#11d462] rounded-lg p-3"
+              >
+                <div className="flex gap-3 items-center">
+                  <FileText className="h-5 w-5 text-[#11d462]" />
+                  <div>
+                    <p className="text-sm truncate">{file.name}</p>
+                    <p className="text-xs text-muted-foreground">
+                      {formatSize(file.size)}
+                    </p>
+                  </div>
+                </div>
+
+                <Button
+                  variant="default"
+                  size="sm"
+                  onClick={() => removeFile(index)}
+                >
+                  <X className="h-4 w-4 text-red-500" />
+                </Button>
+              </div>
+            ))}
+
+            {preview.length > 0 && (
+              <div className="flex flex-wrap gap-2 pt-2">
+                {preview.map((p, i) => (
+                  <Badge key={i} variant="outline">
+                    {p}
+                  </Badge>
+                ))}
+              </div>
+            )}
+          </div>
+        )}
       </div>
     </Card>
   );

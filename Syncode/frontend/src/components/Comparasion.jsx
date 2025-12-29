@@ -2,7 +2,7 @@ import { motion } from "framer-motion";
 
 export const Comaparasion = () => {
   return (
-    <section className="px-4 py-16 sm:px-6 lg:px-12">
+    <section className="px-4 py-10 sm:px-6 lg:px-12">
       <div className="max-w-6xl mx-auto">
         <div className="grid md:grid-cols-2 gap-10 relative">
           {/* vertical divider */}

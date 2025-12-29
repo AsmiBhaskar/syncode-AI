@@ -50,14 +50,14 @@ export const HeroSection = () => {
           </div>
 
           {/* CENTERED SUBHEADING + BUTTONS */}
-          <div className="w-full flex flex-col items-center text-center mt-6">
+          <div className="w-full flex flex-col items-center text-center mt-2">
             <motion.h2
               initial={{ opacity: 0, y: 30 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.8, delay: 0.3 }}
-              className="text-white text-lg mt-4"
+              className="text-white text-2xl sm:text-3xl"
             >
-              Upload, automate, accelerate
+              Upload, Automate, and Accelerate
             </motion.h2>
 
             <motion.div
@@ -81,19 +81,11 @@ export const HeroSection = () => {
                 hover:bg-#11d462
                 "
               >
-                Try Demo
+                Start Demo
                 <span className="transform transition-all duration-300 group-hover:translate-x-2">
                   ➜
                 </span>
               </motion.button>
-
-              <Button
-                variant="default"
-                size="lg"
-                className="hover:scale-110 hover:bg-yellow-500 transition-transform w-full sm:w-auto border-primary"
-              >
-                Request Enterprise Demo
-              </Button>
             </motion.div>
           </div>
         </div>

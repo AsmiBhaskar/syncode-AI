@@ -1,0 +1,80 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
+// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+// Company Model
+model Company {
+  id                 Int      @id @default(autoincrement())
+  name               String
+  registrationNumber String   @unique
+  country            String
+  state              String
+  industryType       String
+  createdAt          DateTime @default(now())
+  updatedAt          DateTime @updatedAt
+
+  // Relations
+  users              User[]
+}
+
+// User Model
+model User {
+  id                Int      @id @default(autoincrement())
+  fullName          String
+  email             String   @unique
+  mobile            String
+  designation       String
+  password          String
+  acceptedNDA       Boolean  @default(false)
+  acceptedDataConsent Boolean @default(false)
+  createdAt         DateTime @default(now())
+  updatedAt         DateTime @updatedAt
+
+  companyId         Int
+  company           Company  @relation(fields: [companyId], references: [id])
+
+  transcripts       Transcript[]  
+}
+
+model Transcript {
+  id                Int      @id @default(autoincrement())
+  transcriptId      String   @unique
+
+  userId            Int
+  user              User     @relation(fields: [userId], references: [id])
+
+  inputType         InputType
+  filePaths         String[]
+
+  rawText           String?
+
+  caseId            String?
+  insuranceProvider String?
+  policyType        String?
+  service           String?
+
+  status            TranscriptStatus @default(PROCESSING)
+  createdAt         DateTime @default(now())
+}
+
+enum TranscriptStatus {
+  PROCESSING
+  COMPLETED
+  FAILED
+}
+
+enum InputType {
+  FILE
+  TEXT
+}

@@ -1,3 +1,4 @@
+import { motion } from "framer-motion";
 import {
   FileSearch,
   GitBranch,
@@ -10,77 +11,123 @@ import {
 const features = [
   {
     icon: Zap,
-    title: "Automated Standardized Coding",
+    title: "Automated Medical Code Extraction",
     description:
-      "Extract diagnoses, procedures, lab tests and medications from raw reports and map them to ICD, CPT, LOINC and NDC with provenance — no manual lookups.",
+      "Upload large medical transcripts and automatically extract ICD, CPT, LOINC, and NDC codes — saving manual effort and time.",
   },
   {
     icon: FileSearch,
     title: "Full Text Traceability",
     description:
-      "Every code links directly to the exact sentence in the original document. Click any code to see the source text, page number, and confidence score.",
+      "Every extracted code is linked directly to the exact page and sentence in the transcript, including confidence scores for verification.",
   },
   {
     icon: GitBranch,
-    title: "Audit-Ready Output",
+    title: "Integrated Audit Processing",
     description:
-      "Complete chain of custody from source text to final code. Track who assigned codes, when, and why. Perfect for compliance reviews and payer audits.",
+      "Perform extraction and audit together or audit existing codes separately. Get accurate results with complete process transparency.",
   },
   {
     icon: Shield,
-    title: "HIPAA-Compliant Infrastructure",
+    title: "Policy & Compliance Checks",
     description:
-      "PHI encrypted at rest (AES-256) and in transit (TLS 1.2+). Role-based access control, audit logging, and configurable data retention.",
+      "Automatically review transcripts and codes for compliance with national and organizational standards, reducing regulatory risk.",
   },
   {
     icon: Database,
-    title: "RAG-Powered Intelligence",
+    title: "RAG-Powered AI Intelligence",
     description:
-      "Retrieval-augmented generation over vetted medical knowledge bases ensures accurate code suggestions with transparent provenance.",
+      "Leverages retrieval-augmented generation over verified medical knowledge bases for highly accurate code suggestions with transparent provenance.",
   },
   {
     icon: FileOutput,
     title: "Flexible Export & Integration",
     description:
-      "Export JSON or CSV with full provenance. API-first design for seamless integration with your EHR, billing, and analytics systems.",
+      "Export results in JSON or CSV format with full process details. Seamlessly integrate with your EHR, insurance, or analytics systems.",
   },
 ];
 
+const containerVariants = {
+  hidden: { opacity: 0 },
+  visible: {
+    opacity: 1,
+    transition: {
+      staggerChildren: 0.12, // one-by-one animation
+    },
+  },
+};
+
+const itemVariants = {
+  hidden: { opacity: 0, y: 24 },
+  visible: {
+    opacity: 1,
+    y: 0,
+    transition: {
+      duration: 0.5,
+      ease: "easeOut",
+    },
+  },
+};
+
 export const Features = () => {
   return (
-    <section id="features" className="py-20 md:py-28">
+    <section id="features" className="py-5 md:py-10">
       <div className="container mx-auto px-4">
-        <div className="text-center max-w-3xl mx-auto mb-16">
+        {/* Heading animation */}
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true }}
+          transition={{ duration: 0.6 }}
+          className="text-center max-w-3xl mx-auto mb-16"
+        >
           <h2 className="text-3xl md:text-4xl lg:text-5xl font-bold text-yellow-500 mb-4">
-            Built for Medical Coding Teams
+            Powerful Features
           </h2>
-          <p className="text-lg text-muted-foreground text-slate-300">
-            Everything you need to extract, code, and audit medical reports with
-            confidence and compliance.
+          <p className="text-lg text-slate-300">
+            Everything you need to extract, audit, and validate medical reports
+            with confidence and compliance.
           </p>
-        </div>
+        </motion.div>
 
-        <div className="grid gap-8 md:grid-cols-2 lg:grid-cols-3">
+        {/* Feature cards */}
+        <motion.div
+          variants={containerVariants}
+          initial="hidden"
+          whileInView="visible"
+          viewport={{ once: true }}
+          className="grid gap-8 md:grid-cols-2 lg:grid-cols-3"
+        >
           {features.map((feature, index) => {
             const Icon = feature.icon;
             return (
-              <div
+              <motion.div
                 key={index}
-                className="group relative rounded-xl border bg-card p-6 shadow-sm hover:shadow-clinical border-[#11d462] transition-all duration-300"
+                variants={itemVariants}
+                whileHover={{
+                  y: -6,
+                  boxShadow: "0px 20px 40px rgba(17, 212, 98, 0.25)",
+                }}
+                transition={{ type: "spring", stiffness: 300, damping: 20 }}
+                className="group relative rounded-xl border border-[#11d462] bg-card p-6 cursor-pointer"
               >
-                <div className="mb-4 inline-flex h-12 w-12 items-center justify-center rounded-lg bg-[#11d4621a]">
+                <motion.div
+                  whileHover={{ scale: 1.1 }}
+                  className="mb-4 inline-flex h-12 w-12 items-center justify-center rounded-lg bg-[#11d4621a]"
+                >
                   <Icon className="h-6 w-6 text-[#11d462]" />
-                </div>
+                </motion.div>
+
                 <h3 className="text-xl font-bold text-yellow-600 mb-2">
                   {feature.title}
                 </h3>
                 <p className="text-muted-foreground leading-relaxed">
                   {feature.description}
                 </p>
-              </div>
+              </motion.div>
             );
           })}
-        </div>
+        </motion.div>
       </div>
     </section>
   );

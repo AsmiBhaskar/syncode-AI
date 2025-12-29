@@ -1,5 +1,6 @@
 import { Shield, Lock, Eye, FileCheck } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
+import { motion } from "framer-motion";
 
 const securityFeatures = [
   {
@@ -25,9 +26,31 @@ const securityFeatures = [
   },
 ];
 
+const securityContainerVariants = {
+  hidden: { opacity: 0 },
+  visible: {
+    opacity: 1,
+    transition: {
+      staggerChildren: 0.15, // one-by-one
+    },
+  },
+};
+
+const securityItemVariants = {
+  hidden: { opacity: 0, y: 20 },
+  visible: {
+    opacity: 1,
+    y: 0,
+    transition: {
+      duration: 0.5,
+      ease: "easeOut",
+    },
+  },
+};
+
 export const Security = () => {
   return (
-    <section id="security" className="py-20 md:py-28 border-b border-border">
+    <section id="security" className="py-5 md:py-10 border-b border-border">
       <div className="container mx-auto px-4">
         <div className="grid gap-12 lg:grid-cols-2 items-center">
           <div>
@@ -44,7 +67,7 @@ export const Security = () => {
               up to meet HIPAA requirements and protect patient privacy.
             </p>
 
-            <div className="bg-red-50 border-2 border-red-400 rounded-lg p-3">
+            <div className="bg-red-50 border-4 border-red-600 rounded-lg p-3">
               <p className="text-sm text-black leading-relaxed">
                 <strong>Important:</strong> This application provides coding
                 suggestions and traceability to source text. It does not make
@@ -55,13 +78,25 @@ export const Security = () => {
             </div>
           </div>
 
-          <div className="grid gap-6">
+          <motion.div
+            variants={securityContainerVariants}
+            initial="hidden"
+            whileInView="visible"
+            viewport={{ once: true }}
+            className="grid gap-6"
+          >
             {securityFeatures.map((feature, index) => {
               const Icon = feature.icon;
               return (
-                <div
+                <motion.div
                   key={index}
-                  className="flex gap-4 p-6 rounded-xl border border-[#11d462] bg-card shadow-sm hover:shadow-clinical transition-all duration-300"
+                  variants={securityItemVariants}
+                  whileHover={{
+                    y: -5,
+                    boxShadow: "0px 20px 40px rgba(17, 212, 98, 0.25)",
+                  }}
+                  transition={{ type: "spring", stiffness: 300, damping: 20 }}
+                  className="flex gap-4 p-6 rounded-xl border-2 border-[#11d462] bg-card cursor-pointer"
                 >
                   <div className="flex-shrink-0">
                     <div className="inline-flex h-12 w-12 items-center justify-center rounded-lg bg-[#11d4621a]">
@@ -76,10 +111,10 @@ export const Security = () => {
                       {feature.description}
                     </p>
                   </div>
-                </div>
+                </motion.div>
               );
             })}
-          </div>
+          </motion.div>
         </div>
       </div>
     </section>

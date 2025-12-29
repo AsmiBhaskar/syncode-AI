@@ -2,9 +2,10 @@ import React from "react";
 
 const Footer = () => {
   return (
-    <footer className="relative bg-background-dark/80 backdrop-blur-sm border-t border-slate-800 py-10">
-      <div className="flex flex-col items-center text-center gap-3 px-4">
-        <p className="text-sm text-primary-foreground/80">
+    <footer className="bg-background-dark/80 backdrop-blur-sm border-t border-slate-800 pt-5 overflow-hidden">
+      <div className="flex flex-col items-center text-center px-4">
+        {/* Text content */}
+        <p className="text-sm text-primary-foreground/80 mb-2">
           Questions? Email us at{" "}
           <a
             href="mailto:sales@medcodepro.com"
@@ -14,14 +15,11 @@ const Footer = () => {
           </a>
         </p>
 
-        {/* Copyright */}
-        <p className="text-sm text-slate-400">&copy; 2025 SynCode AI</p>
-      </div>
+        <p className="text-sm text-slate-400 mb-2">&copy; 2025 SynCode AI</p>
 
-      {/* WATERMARK */}
-      <div className="mt-6 text-center pointer-events-none">
+        {/* WATERMARK — last element */}
         <span
-          className="text-6xl sm:text-8xl font-extrabold uppercase tracking-widest"
+          className="block text-6xl sm:text-8xl font-extrabold uppercase tracking-widest leading-none select-none pointer-events-none"
           style={{ color: "rgba(17, 212, 98, 0.15)" }}
         >
           SYNCODE AI
