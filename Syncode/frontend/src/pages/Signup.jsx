@@ -89,7 +89,7 @@ export default function SignUpPage() {
         layout
         className={`w-full transition-all duration-500 shadow-[0_10px_30px_rgba(17,212,98,0.35)] ${
           isCompanyComplete ? "max-w-5xl" : "max-w-md"
-        } bg-card border border-[#11d462] rounded-xl p-8`}
+        } bg-[#11d462]/5 border border-[#11d462] rounded-xl p-8`}
       >
         {/* HEADER */}
         <div className="text-center mb-6">

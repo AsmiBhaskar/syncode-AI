@@ -67,7 +67,7 @@ export const Security = () => {
               up to meet HIPAA requirements and protect patient privacy.
             </p>
 
-            <div className="bg-red-50 border-4 border-red-600 rounded-lg p-3">
+            <div className="bg-red-50 border-4 border-red-600 rounded-xl p-3">
               <p className="text-sm text-black leading-relaxed">
                 <strong>Important:</strong> This application provides coding
                 suggestions and traceability to source text. It does not make
@@ -96,10 +96,10 @@ export const Security = () => {
                     boxShadow: "0px 20px 40px rgba(17, 212, 98, 0.25)",
                   }}
                   transition={{ type: "spring", stiffness: 300, damping: 20 }}
-                  className="flex gap-4 p-6 rounded-xl border-2 border-[#11d462] bg-card cursor-pointer"
+                  className="flex gap-4 p-6 rounded-xl border-2 border-[#11d462] bg-[#11d462]/5 cursor-pointer"
                 >
                   <div className="flex-shrink-0">
-                    <div className="inline-flex h-12 w-12 items-center justify-center rounded-lg bg-[#11d4621a]">
+                    <div className="inline-flex h-12 w-12 items-center justify-center rounded-xl bg-[#11d4621a]">
                       <Icon className="h-6 w-6 text-[#11d462]" />
                     </div>
                   </div>

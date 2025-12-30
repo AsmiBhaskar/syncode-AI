@@ -109,11 +109,11 @@ export const Features = () => {
                   boxShadow: "0px 20px 40px rgba(17, 212, 98, 0.25)",
                 }}
                 transition={{ type: "spring", stiffness: 300, damping: 20 }}
-                className="group relative rounded-xl border border-[#11d462] bg-card p-6 cursor-pointer"
+                className="group relative rounded-xl border border-[#11d462] bg-[#11d462]/5 p-6 cursor-pointer"
               >
                 <motion.div
                   whileHover={{ scale: 1.1 }}
-                  className="mb-4 inline-flex h-12 w-12 items-center justify-center rounded-lg bg-[#11d4621a]"
+                  className="mb-4 inline-flex h-12 w-12 items-center justify-center rounded-xl bg-[#11d4621a]"
                 >
                   <Icon className="h-6 w-6 text-[#11d462]" />
                 </motion.div>
