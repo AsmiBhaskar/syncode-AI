@@ -16,7 +16,7 @@ export const Comaparasion = () => {
             className="space-y-6"
           >
             <div className="flex items-center gap-3">
-              <div className="w-12 h-12 rounded-lg flex items-center justify-center">
+              <div className="w-12 h-12 rounded-xl flex items-center justify-center">
                 <span className="text-yellow-600 text-4xl">⚠️</span>
               </div>
               <div className="flex items-center gap-3">
@@ -27,7 +27,7 @@ export const Comaparasion = () => {
               </div>
             </div>
 
-            <div className="bg-card border border-[#11d462] rounded-xl p-5 space-y-4">
+            <div className="bg-[#11d462]/5 border border-[#11d462] rounded-xl p-5 space-y-4">
               <div className="flex justify-between items-center">
                 <div>
                   <div className="font-semibold">
@@ -51,7 +51,7 @@ export const Comaparasion = () => {
                 </ul>
               </div>
 
-              <div className="bg-red-50 border-2 border-red-400 rounded-lg p-3">
+              <div className="bg-red-50 border-2 border-red-400 rounded-xl p-3">
                 <div className="flex items-start gap-3">
                   <div className="text-red-600">⚠</div>
                   <div>
@@ -76,7 +76,7 @@ export const Comaparasion = () => {
             className="space-y-6"
           >
             <div className="flex items-center gap-3">
-              <div className="w-12 h-12 rounded-lg flex items-center justify-center">
+              <div className="w-12 h-12 rounded-xl flex items-center justify-center">
                 <span className="text-emerald-600 text-4xl">🧠</span>
               </div>
               <div className="flex items-center gap-3">
@@ -89,7 +89,7 @@ export const Comaparasion = () => {
               </div>
             </div>
 
-            <div className="bg-card border border-[#11d462] rounded-xl p-5 space-y-4">
+            <div className="bg-[#11d462]/5 border border-[#11d462] rounded-xl p-5 space-y-4">
               <div className="flex justify-between items-center">
                 <div>
                   <div className="font-semibold">Automated Run</div>
@@ -142,7 +142,7 @@ export const Comaparasion = () => {
               </div>
 
               {/* Audit summary */}
-              <div className="bg-muted/30 rounded-lg p-3 border border-[#11d462]">
+              <div className="bg-muted/30 rounded-xl p-3 border border-[#11d462]">
                 <div className="flex items-center justify-between">
                   <div>
                     <div className="text-sm font-medium">

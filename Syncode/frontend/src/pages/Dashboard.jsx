@@ -9,7 +9,7 @@ import {
   Users,
 } from "lucide-react";
 import { useEffect, useState } from "react";
-import Navbar from "@/components/Navbar";
+import Navbar from "@/components/common/Navbar";
 
 export function DashboardPage() {
   const [user, setUser] = useState(null);
@@ -29,6 +29,25 @@ export function DashboardPage() {
       (w) => w.charAt(0).toUpperCase() + w.slice(1).toLowerCase()
     );
 
+  function formatTimeAgo(date) {
+    const now = Date.now();
+    const diff = now - new Date(date).getTime(); // difference in ms
+
+    const seconds = Math.floor(diff / 1000);
+    const minutes = Math.floor(diff / (1000 * 60));
+    const hours = Math.floor(diff / (1000 * 60 * 60));
+    const days = Math.floor(diff / (1000 * 60 * 60 * 24));
+    const months = Math.floor(days / 30);
+    const years = Math.floor(days / 365);
+
+    if (seconds < 60) return `${seconds}s ago`;
+    if (minutes < 60) return `${minutes}m ago`;
+    if (hours < 24) return `${hours}h ago`;
+    if (days < 30) return `${days}d ago`;
+    if (months < 12) return `${months}mo ago`;
+    return `${years}y ago`;
+  }
+
   useEffect(() => {
     fetch("http://localhost:5000/api/dashboard", {
       credentials: "include",
@@ -38,22 +57,10 @@ export function DashboardPage() {
         return res.json();
       })
       .then((data) => {
-        const now = Date.now();
-
-        const formattedActivity = (data.recentActivity || []).map((a) => {
-          const diff = now - new Date(a.createdAt).getTime();
-          const minutes = Math.floor(diff / 60000);
-
-          const timeAgo =
-            minutes < 60
-              ? `${minutes}m ago`
-              : `${Math.floor(minutes / 60)}h ago`;
-
-          return {
-            ...a,
-            timeAgo,
-          };
-        });
+        const formattedActivity = (data.recentActivity || []).map((a) => ({
+          ...a,
+          timeAgo: formatTimeAgo(a.createdAt),
+        }));
 
         console.log("Dashboard user:", data.user);
 
@@ -93,7 +100,7 @@ export function DashboardPage() {
         <div className="my-8">
           <Link
             to="/upload"
-            className="inline-flex items-center gap-2 px-6 py-3 bg-[#11d462] text-black rounded-lg hover:text-foreground hover:scale-110 "
+            className="inline-flex items-center gap-2 px-6 py-3 bg-[#11d462] text-black rounded-xl hover:text-foreground hover:scale-110 "
           >
             <Upload className="w-5 h-5" />
             Upload New Transcript
@@ -101,7 +108,7 @@ export function DashboardPage() {
         </div>
 
         {/* Total */}
-        <div className="bg-card border border-[#11d462] rounded-xl p-6 mb-10 max-w-sm">
+        <div className="bg-[#11d462]/5 border border-[#11d462] rounded-xl p-6 mb-10 max-w-sm">
           <div className="flex gap-4">
             <FileText className="w-8 h-8 text-[#11d462]" />
             <div>
@@ -114,7 +121,7 @@ export function DashboardPage() {
         </div>
 
         {/* Recent Activity */}
-        <div className="bg-card border border-border rounded-xl p-6">
+        <div className="bg-[#11d462]/5 border border-border rounded-xl p-6">
           <h3 className="mb-4">Recent Activity</h3>
 
           {recentActivity.length === 0 ? (
@@ -122,11 +129,11 @@ export function DashboardPage() {
               No transcripts uploaded yet.
             </p>
           ) : (
-            <div className="space-y-4">
+            <div className="space-y-4 ">
               {recentActivity.map((a) => (
                 <div
                   key={a.id}
-                  className="flex justify-between items-center p-4 bg-secondary rounded-lg border border-[#11d462]"
+                  className="flex justify-between items-center p-4 bg-[#11d462]/10 rounded-xl border border-[#11d462]"
                 >
                   {/* LEFT */}
                   <div className="space-y-1">

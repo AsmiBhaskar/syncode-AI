@@ -63,7 +63,7 @@ export const signup = async (req, res) => {
     const token = jwt.sign(
       { id: user.id, email: user.email },
       process.env.JWT_SECRET,
-      { expiresIn: "1h" }
+      { expiresIn: "7d" }
     );
 
     // Set HTTP-only cookie
@@ -71,7 +71,7 @@ export const signup = async (req, res) => {
       httpOnly: true,
       secure: process.env.NODE_ENV === "production",
       sameSite: "Strict",
-      maxAge: 7 * 24 * 60 * 60 * 1000, // 1 hour
+      maxAge: 7 * 24 * 60 * 60 * 1000,
     });
 
     // Respond without password
@@ -103,7 +103,7 @@ export const login = async (req, res) => {
     const token = jwt.sign(
       { id: user.id, email: user.email },
       process.env.JWT_SECRET,
-      { expiresIn: "1h" }
+      { expiresIn: "7d" }
     );
 
     res.cookie("syncodeToken", token, {

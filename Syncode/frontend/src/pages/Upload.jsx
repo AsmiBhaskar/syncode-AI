@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { UploadZone } from "@/components/UploadZone";
+import { UploadZone } from "@/components/upload/UploadZone";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
@@ -7,8 +7,8 @@ import { useToast } from "@/hooks/use-toast";
 import { useNavigate } from "react-router-dom";
 import * as pdfjsLib from "pdfjs-dist";
 import { FileText, Folder, Paintbrush } from "lucide-react";
-import Navbar from "@/components/Navbar";
-import { MetadataForm } from "@/components/Metadatform";
+import Navbar from "@/components/common/Navbar";
+import { MetadataForm } from "@/components/upload/Metadatform";
 import { cn } from "@/lib/utils";
 
 pdfjsLib.GlobalWorkerOptions.workerSrc = `https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js`;
@@ -20,6 +20,18 @@ const Upload = () => {
   const [transcriptFiles, setTranscriptFiles] = useState([]);
   const [transcriptStatus, setTranscriptStatus] = useState("idle");
   const [transcriptText, setTranscriptText] = useState("");
+
+  const [metadata, setMetadata] = useState({
+    caseId: "",
+    insuranceProvider: "",
+    policyType: "",
+    service: "",
+  });
+
+  const isMetadataValid =
+    metadata.caseId.trim() !== "" &&
+    metadata.insuranceProvider.trim() !== "" &&
+    metadata.policyType.trim() !== "";
 
   const hasFiles = transcriptFiles.length > 0;
   const hasText = transcriptText.trim().length > 0;
@@ -39,16 +51,6 @@ const Upload = () => {
       description: `${files.length} file(s) processed`,
     });
   };
-  const [metadata, setMetadata] = useState({
-    caseId: "",
-    insuranceProvider: "",
-    policyType: "",
-    service: "full-pipeline",
-  });
-  const isMetadataValid =
-    metadata.caseId.trim() !== "" &&
-    metadata.insuranceProvider.trim() !== "" &&
-    metadata.policyType.trim() !== "";
 
   const handleUploadStart = async () => {
     if (!hasFiles && !hasText) {

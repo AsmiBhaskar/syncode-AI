@@ -1,11 +1,11 @@
 import React from "react";
-import Navbar from "../components/Navbar";
-import Footer from "../components/Footer";
-import { HeroSection } from "@/components/HeroSection";
-import { Features } from "@/components/Features";
-import { HowItWorks } from "@/components/HowItWorks";
-import { Security } from "@/components/Security";
-import { Comaparasion } from "@/components/Comparasion";
+import Navbar from "../components/common/Navbar";
+import Footer from "../components/common/Footer";
+import { HeroSection } from "@/components/home/HeroSection";
+import { Features } from "@/components/home/Features";
+import { HowItWorks } from "@/components/home/HowItWorks";
+import { Security } from "@/components/home/Security";
+import { Comaparasion } from "@/components/home/Comparasion";
 
 const Home = () => {
   return (

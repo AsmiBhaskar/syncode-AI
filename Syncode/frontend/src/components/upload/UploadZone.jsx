@@ -101,7 +101,7 @@ export const UploadZone = ({
         {/* Drop Area */}
         <div
           className={cn(
-            "flex flex-col items-center justify-center rounded-lg border-2 border-dashed border-[#11d462] p-8 cursor-pointer transition-colors",
+            "flex flex-col items-center justify-center rounded-xl border-2 border-dashed border-[#11d462] p-8 cursor-pointer transition-colors",
             isDragging ? "bg-[#11d4620D]" : "bg-muted/30"
           )}
           onDrop={handleDrop}
@@ -145,7 +145,7 @@ export const UploadZone = ({
           type="text"
           value={testInput}
           onChange={handleTestInputChange}
-          className="relative z-[9999] w-full px-4 py-3 bg-input border border-[#11d462] rounded-lg focus:border-[#11d462] focus:outline-none focus:ring-1 focus:ring-[#11d462]"
+          className="relative z-[9999] w-full px-4 py-3 bg-input border border-[#11d462] rounded-xl focus:border-[#11d462] focus:outline-none focus:ring-1 focus:ring-[#11d462]"
         />
 
         {/* File List */}
@@ -161,7 +161,7 @@ export const UploadZone = ({
             {files.map((file, index) => (
               <div
                 key={index}
-                className="flex items-center justify-between bg-black border border-[#11d462] rounded-lg p-3"
+                className="flex items-center justify-between bg-black border border-[#11d462] rounded-xl p-3"
               >
                 <div className="flex gap-3 items-center">
                   <FileText className="h-5 w-5 text-[#11d462]" />

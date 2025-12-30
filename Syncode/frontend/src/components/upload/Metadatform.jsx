@@ -1,4 +1,4 @@
-import { Card } from "./ui/card";
+import { Card } from "../ui/card";
 
 export const MetadataForm = ({ metadata, setMetadata }) => {
   return (
@@ -41,10 +41,22 @@ export const MetadataForm = ({ metadata, setMetadata }) => {
               Select
             </option>
             <option className="bg-green-800 text-white" value="health">
-              Health
+              Health Insurance
             </option>
             <option className="bg-green-800 text-white" value="life">
-              Life
+              Life Insurance
+            </option>
+            <option
+              className="bg-green-800 text-white"
+              value="critical-illness"
+            >
+              Critical Illness
+            </option>
+            <option
+              className="bg-green-800 text-white"
+              value="personal-accident"
+            >
+              Personal Accident
             </option>
           </select>
         </div>
@@ -59,10 +71,13 @@ export const MetadataForm = ({ metadata, setMetadata }) => {
             className="w-full px-4 py-3 bg-input text-foreground border border-border rounded-xl focus:border-[#11d462] focus:outline-none focus:ring-1 focus:ring-[#11d462]"
           >
             <option className="bg-green-800 text-white" value="full-pipeline">
-              Full Pipeline
+              Full Pipeline(All Services)
             </option>
             <option className="bg-green-800 text-white" value="audit">
               Audit Only
+            </option>
+            <option className="bg-green-800 text-white" value="compliance">
+              Compliance Only
             </option>
           </select>
         </div>

@@ -7,6 +7,7 @@ import HomePage from "./pages/Home";
 import PublicRoute from "./routes/PublicRoute";
 import ProtectedRoute from "./routes/ProtectedRoute";
 import { DashboardPage } from "./pages/Dashboard";
+import { ProcessingPage } from "./pages/Processing";
 
 function App() {
   return (
@@ -39,6 +40,15 @@ function App() {
           </ProtectedRoute>
         }
       />
+      <Route
+        path="/processing/:transcriptId"
+        element={
+          <ProtectedRoute>
+            <ProcessingPage />
+          </ProtectedRoute>
+        }
+      />
+
       <Route
         path="/dashboard"
         element={
