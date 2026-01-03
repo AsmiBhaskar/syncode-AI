@@ -57,7 +57,7 @@ model Transcript {
   filePaths         String[]
   rawText           String?
 
-  caseId            String?
+  caseId            String? @unique
   insuranceProvider String?
   policyType        String?
   service           String?
@@ -66,7 +66,10 @@ model Transcript {
   createdAt         DateTime @default(now())
 
   processingStatus  ProcessingStatus?
+
+  medicalCodes      MedicalCode[]
 }
+
 
 model ProcessingStatus {
   id            Int      @id @default(autoincrement())
@@ -90,4 +93,15 @@ enum TranscriptStatus {
 enum InputType {
   FILE
   TEXT
+}
+
+model MedicalCode {
+  id           Int        @id @default(autoincrement())
+  transcriptId Int
+  transcript   Transcript @relation(fields: [transcriptId], references: [id])
+
+  code         String
+  type         String     
+
+  createdAt    DateTime   @default(now())
 }

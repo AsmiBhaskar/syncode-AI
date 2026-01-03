@@ -70,6 +70,7 @@ export const MetadataForm = ({ metadata, setMetadata }) => {
             }
             className="w-full px-4 py-3 bg-input text-foreground border border-border rounded-xl focus:border-[#11d462] focus:outline-none focus:ring-1 focus:ring-[#11d462]"
           >
+            <option value="disabled">Select</option>
             <option className="bg-green-800 text-white" value="full-pipeline">
               Full Pipeline(All Services)
             </option>

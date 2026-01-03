@@ -50,7 +50,7 @@ function App() {
       />
 
       <Route
-        path="/processing"
+        path="/processing/:transcriptId"
         element={
           <ProtectedRoute>
             <ProcessingPage />
@@ -87,7 +87,7 @@ function App() {
       />
 
       <Route
-        path="/results/full-pipeline"
+        path="/results/full-pipeline/:caseId"
         element={
           <ProtectedRoute>
             <FullPipeline />

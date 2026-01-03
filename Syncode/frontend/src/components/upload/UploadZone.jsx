@@ -176,7 +176,10 @@ export const UploadZone = ({
                 <Button
                   variant="default"
                   size="sm"
-                  onClick={() => removeFile(index)}
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    removeFile(index);
+                  }}
                 >
                   <X className="h-4 w-4 text-red-500" />
                 </Button>
