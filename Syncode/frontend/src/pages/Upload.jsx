@@ -31,7 +31,11 @@ const Upload = () => {
 
   /* ---------------- Validation ---------------- */
 
-  const allowedServices = ["full-pipeline", "audit", "compliance"];
+  const allowedServices = [
+    "full-pipeline",
+    "audit-only",
+    "compliance-only",
+  ];
 
   const isMetadataValid =
     metadata.caseId.trim() !== "" &&

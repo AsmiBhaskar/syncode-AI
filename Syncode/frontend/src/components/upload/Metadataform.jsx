@@ -74,10 +74,10 @@ export const MetadataForm = ({ metadata, setMetadata }) => {
             <option className="bg-green-800 text-white" value="full-pipeline">
               Full Pipeline(All Services)
             </option>
-            <option className="bg-green-800 text-white" value="audit">
+            <option className="bg-green-800 text-white" value="audit-only">
               Audit Only
             </option>
-            <option className="bg-green-800 text-white" value="compliance">
+            <option className="bg-green-800 text-white" value="compliance-only">
               Compliance Only
             </option>
           </select>

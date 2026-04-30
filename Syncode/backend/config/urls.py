@@ -17,9 +17,11 @@ Including another URLconf
 
 from django.contrib import admin
 from django.urls import path
+from apps.ingestion.views import extract_codes
 from apps.vector_search.views import vector_search
 
 urlpatterns = [
     path('admin/', admin.site.urls),
     path('api/vector-search/', vector_search, name='vector_search'),
+    path('api/ingestion/extract/', extract_codes, name='extract_codes'),
 ]

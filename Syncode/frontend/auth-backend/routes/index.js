@@ -3,6 +3,7 @@ import express from "express";
 import authRoutes from "./auth.routes.js";
 import dashboardRoutes from "./dashboard.routes.js";
 import transcriptRoutes from "./transcript.routes.js";
+import resultRoutes from "./result.routes.js";
 
 const router = express.Router();
 
@@ -15,5 +16,6 @@ router.get("/", (req, res) => {
 router.use("/auth", authRoutes);
 router.use("/dashboard", dashboardRoutes);
 router.use("/transcripts", transcriptRoutes);
+router.use("/results", resultRoutes);
 
 export default router;
