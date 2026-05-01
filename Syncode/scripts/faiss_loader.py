@@ -20,6 +20,20 @@ def load_resources():
     index = faiss.read_index(INDEX_PATH)
     meta = np.load(META_PATH, allow_pickle=True)
 
-    model = SentenceTransformer("sentence-transformers/all-mpnet-base-v2")
+    model_map = {
+        384: "sentence-transformers/all-MiniLM-L6-v2",
+        768: "sentence-transformers/all-mpnet-base-v2",
+    }
+
+    model_name = model_map.get(index.d)
+    if not model_name:
+        raise ValueError(f"Unsupported FAISS dimension: {index.d}")
+
+    model = SentenceTransformer(model_name)
+    if model.get_sentence_embedding_dimension() != index.d:
+        raise ValueError(
+            "Embedding dimension mismatch: "
+            f"model={model.get_sentence_embedding_dimension()} index={index.d}"
+        )
 
     return index, meta, model

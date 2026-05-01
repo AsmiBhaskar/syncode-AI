@@ -41,6 +41,8 @@ df = df[
     ]
 ].dropna(subset=['code_desc'])
 
+df = df.fillna("")
+
 texts = df['code_desc'].astype(str).tolist()
 codes = df['code'].astype(str).tolist()
 sections = df[
@@ -53,7 +55,7 @@ sections = df[
     ]
 ].astype(str).values
 
-model = SentenceTransformer('sentence-transformers/all-mpnet-base-v2')
+model = SentenceTransformer('sentence-transformers/all-MiniLM-L6-v2')
 
 embeddings = model.encode(
     texts,

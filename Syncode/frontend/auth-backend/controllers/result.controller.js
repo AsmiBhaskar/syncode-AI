@@ -1,37 +1,26 @@
 import { PrismaClient } from "@prisma/client";
-import fetch from "node-fetch"; // For calling external AI model
+import { requestIngestion } from "../services/ingestion.service.js";
 
 const prisma = new PrismaClient();
 
-async function callAIModelBackend() {
-  console.log("⚠️ AI not integrated yet, using fallback");
-  return null;
+async function updateProcessingStatus({ transcriptId, service, progress, currentStep, steps }) {
+  const statusUrl = process.env.PROCESSING_STATUS_URL;
+  if (!statusUrl) {
+    return;
+  }
+
+  const headers = { "Content-Type": "application/json" };
+  const apiKey = process.env.INTERNAL_API_KEY;
+  if (apiKey) {
+    headers["x-internal-api-key"] = apiKey;
+  }
+
+  await fetch(statusUrl, {
+    method: "POST",
+    headers,
+    body: JSON.stringify({ transcriptId, service, progress, currentStep, steps }),
+  });
 }
-
-// This function simulates calling a real AI model backend
-// async function callAIModelBackend(transcriptText) {
-//   try {
-//     // Imagine this is your AI model endpoint
-//     // const response = await fetch(
-//     //   "https://your-ai-backend.com/api/extract-codes",
-//     //   {
-//     //     method: "POST",
-//     //     headers: { "Content-Type": "application/json" },
-//     //     body: JSON.stringify({ text: transcriptText }),
-//     //   }
-//     // );
-
-//     // if (!response.ok) throw new Error("AI model returned error");
-
-//     // const data = await response.json();
-//     // Example AI response format: [{ code: "A123", type: "ICD-10" }, ...]
-//     // return data.codes || [];
-
-//   } catch (err) {
-//     console.error("AI model call failed:", err.message);
-//     return null; // will trigger fallback
-//   }
-// }
 
 export const getResultsByCaseId = async (req, res) => {
   const { caseId } = req.params;
@@ -46,32 +35,97 @@ export const getResultsByCaseId = async (req, res) => {
       return res.status(404).json({ error: "Transcript not found" });
     }
 
+    if (transcript.status === "PROCESSING" && transcript.medicalCodes.length === 0) {
+      return res.status(202).json({
+        error: "Transcript is still processing",
+        medicalCodes: [],
+      });
+    }
+
     let medicalCodes = transcript.medicalCodes;
 
     // If no codes yet, call AI model
     if (!medicalCodes || medicalCodes.length === 0) {
-      const aiCodes = await callAIModelBackend(transcript.rawText || "");
+      try {
+        const steps = [
+          { name: "Ingestion", description: "Analyzing transcript", status: "IN_PROGRESS" },
+          { name: "Code Extraction", description: "Matching ICD codes", status: "PENDING" },
+          { name: "Finalize", description: "Saving results", status: "PENDING" },
+        ];
 
-      if (aiCodes && aiCodes.length > 0) {
+        await updateProcessingStatus({
+          transcriptId: transcript.transcriptId,
+          service: transcript.service || "full-pipeline",
+          progress: 10,
+          currentStep: "Ingestion",
+          steps,
+        });
+
+        const aiCodes = await requestIngestion({
+          rawText: transcript.rawText || "",
+          filePaths: transcript.filePaths || [],
+        });
+
+        steps[0].status = "DONE";
+        steps[1].status = "IN_PROGRESS";
+
+        await updateProcessingStatus({
+          transcriptId: transcript.transcriptId,
+          service: transcript.service || "full-pipeline",
+          progress: 60,
+          currentStep: "Code Extraction",
+          steps,
+        });
+
+        const mappedCodes = (aiCodes || [])
+          .map((c) => ({
+            transcriptId: transcript.id,
+            code: c.code || c.icd_code,
+            type: c.type || "ICD-10",
+          }))
+          .filter((c) => c.code);
+
+        if (mappedCodes.length === 0) {
+          return res.status(502).json({
+            error: "AI ingestion returned no codes",
+            medicalCodes: [],
+          });
+        }
+
         // Save AI codes to DB
         await prisma.medicalCode.createMany({
-          data: aiCodes.map((c) => ({
-            transcriptId: transcript.id,
-            code: c.code,
-            type: c.type,
-          })),
+          data: mappedCodes,
+        });
+
+        steps[1].status = "DONE";
+        steps[2].status = "IN_PROGRESS";
+
+        await updateProcessingStatus({
+          transcriptId: transcript.transcriptId,
+          service: transcript.service || "full-pipeline",
+          progress: 90,
+          currentStep: "Finalize",
+          steps,
         });
 
         // Fetch saved codes
         medicalCodes = await prisma.medicalCode.findMany({
           where: { transcriptId: transcript.id },
         });
-      } else {
-        // Fallback mock if AI fails or returns nothing
-        medicalCodes = [
-          { code: "A123", type: "ICD-10" },
-          { code: "B456", type: "ICD-10" },
-        ];
+
+        steps[2].status = "DONE";
+        await updateProcessingStatus({
+          transcriptId: transcript.transcriptId,
+          service: transcript.service || "full-pipeline",
+          progress: 100,
+          currentStep: "Completed",
+          steps,
+        });
+      } catch (err) {
+        return res.status(501).json({
+          error: err.message || "AI ingestion is not available",
+          medicalCodes: [],
+        });
       }
     }
 
@@ -79,11 +133,8 @@ export const getResultsByCaseId = async (req, res) => {
   } catch (err) {
     console.error(err);
     res.status(500).json({
-      error: "Failed to fetch results. Showing mock data.",
-      medicalCodes: [
-        { code: "A123", type: "ICD-10" },
-        { code: "B456", type: "ICD-10" },
-      ],
+      error: "Failed to fetch results",
+      medicalCodes: [],
     });
   }
 };

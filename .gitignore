@@ -1,8 +1,10 @@
 venv/
-myvenv/
+myvenv1/
 __pycache__/
 *.pyc
 .DS_Store
 .env
 .idea/
 .vscode/
+myvenv/
+node_modules/

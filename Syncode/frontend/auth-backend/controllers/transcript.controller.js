@@ -1,5 +1,6 @@
 import { prisma } from "../lib/prisma.js";
 import { v4 as uuid } from "uuid";
+import { processTranscript } from "../services/transcriptProcessing.service.js";
 
 const ALLOWED_SERVICES = ["full-pipeline", "audit-only", "compliance-only"];
 
@@ -64,6 +65,12 @@ export const createTranscript = async (req, res) => {
         },
       },
       include: { processingStatus: true },
+    });
+
+    setImmediate(() => {
+      processTranscript(transcript).catch((err) => {
+        console.error("Transcript processing failed:", err);
+      });
     });
 
     return res.status(201).json({

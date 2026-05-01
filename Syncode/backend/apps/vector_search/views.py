@@ -17,7 +17,6 @@ def get_faiss_client():
 def vector_search(request):
 	if request.method == 'POST':
 		try:
-			faiss_client = get_faiss_client()
 			data = json.loads(request.body)
 			query_text = data.get('query')
 			query_vector = data.get('vector')
@@ -25,19 +24,44 @@ def vector_search(request):
 			
 			# Support text-based search (primary method)
 			if query_text:
+				faiss_client = get_faiss_client()
 				results = faiss_client.search_by_text(query_text, k)
 				return JsonResponse({'results': results, 'count': len(results)})
 			
 			# Support vector-based search (backward compatibility)
 			elif query_vector and isinstance(query_vector, list):
+				faiss_client = get_faiss_client()
 				D, I = faiss_client.search(np.array(query_vector, dtype='float32').reshape(1, -1), k)
 				# Return with metadata
 				results = []
 				for i, d in zip(I, D):
-					code, desc = faiss_client.meta[i]
+					meta_entry = faiss_client.meta[i]
+					if len(meta_entry) >= 3:
+						code, desc, section = meta_entry[0], meta_entry[1], meta_entry[2]
+					else:
+						code, desc = meta_entry[0], meta_entry[1]
+						section = ["", "", "", "", ""]
+
+					if isinstance(section, (list, tuple, np.ndarray)):
+						section_values = list(section)
+					else:
+						section_values = []
+					section_values = (section_values + ["", "", "", "", ""])[:5]
+
+					def clean_value(value):
+						if value is None:
+							return ""
+						if isinstance(value, str) and value.strip().lower() == "nan":
+							return ""
+						if isinstance(value, float) and np.isnan(value):
+							return ""
+						return str(value)
 					results.append({
-						"icd_code": str(code),
-						"description": str(desc),
+						"icd_code": clean_value(code),
+						"description": clean_value(desc),
+						"section_id": clean_value(section_values[0]),
+						"section_name": clean_value(section_values[1]),
+						"includes": clean_value(section_values[2]),
 						"distance": float(d)
 					})
 				return JsonResponse({'results': results, 'count': len(results)})
