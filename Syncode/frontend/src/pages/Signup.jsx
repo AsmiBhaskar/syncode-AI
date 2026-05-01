@@ -61,7 +61,7 @@ export default function SignUpPage() {
 
     try {
       const res = await fetch(
-        `${import.meta.env.VITE_BACKEND_URL}/api/auth/signup`,
+        `${import.meta.env.VITE_AUTH_BACKEND_URL}/api/auth/signup`,
         {
           method: "POST",
           headers: {
