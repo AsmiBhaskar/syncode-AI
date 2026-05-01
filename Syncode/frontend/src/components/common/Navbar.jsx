@@ -22,7 +22,7 @@ const Navbar = ({ showNavLinks = true }) => {
 
   const handleLogout = async () => {
     try {
-      await fetch(`${import.meta.env.VITE_BACKEND_URL}/api/auth/logout`, {
+      await fetch(`${import.meta.env.VITE_AUTH_BACKEND_URL}/api/auth/logout`, {
         method: "POST",
         credentials: "include",
       });
